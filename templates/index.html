@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Image Host</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 50px;
+            color: gray;
+        }
+
+        #image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            /* This makes the div take the full height of the viewport */
+        }
+
+        #btn-upload {
+            position: fixed;
+            left: 50%;
+            bottom: 50px;
+            transform: translateX(-50%); /* This is to ensure the button is centered correctly */
+            height: 30px;
+            width: 100px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <textarea id="paste-target" style="opacity: 0; position: absolute; top: 0; left: 0;"></textarea>
+    <div id="image-container">Paste your image here</div>
+    <form method="POST">
+        <input type="hidden" id="image" name="image">
+        <button id="btn-upload" type="submit" style="display:none;">Upload</button>
+    </form>
+    <script>
+        document.getElementById('paste-target').focus();
+        try {
+            document.onpaste = function (event) {
+                var items = (event.clipboardData || event.originalEvent.clipboardData || window.clipboardData).items;
+                for (index in items) {
+                    var item = items[index];
+                    if (item.kind === 'file') {
+                        var blob = item.getAsFile();
+                        var reader = new FileReader();
+                        reader.onload = function (event) {
+                            document.getElementById('image').value = event.target.result;
+                            var img = document.createElement('img');
+                            img.src = event.target.result;
+                            document.getElementById('image-container').innerHTML = '';
+                            document.getElementById('image-container').appendChild(img);
+                            document.getElementById('btn-upload').style.display = 'block';
+                        };
+                        reader.readAsDataURL(blob);
+                    }
+                }
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    </script>
+</body>
+
+</html>
